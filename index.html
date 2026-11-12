@@ -1,1 +1,804 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Familien Wichteln 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FAF8F5',
+            pine: {
+              DEFAULT: '#1B3B2B',
+              light: '#27523C',
+              dark: '#12281D',
+            },
+            gold: {
+              DEFAULT: '#B48A3E',
+              light: '#D4B06A',
+              soft: '#F5EFE2',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #1F2421;
+      background-image: radial-gradient(#E6DFD3 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .card-shadow {
+      box-shadow: 0 20px 45px -15px rgba(27, 59, 43, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+    }
+    .seal-glow {
+      box-shadow: 0 10px 25px -5px rgba(180, 138, 62, 0.45);
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-reveal {
+      animation: fadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased flex flex-col justify-between selection:bg-gold/20 selection:text-pine">
 
+  <!-- Hauptcontainer -->
+  <main class="w-full max-w-2xl mx-auto px-4 py-10 sm:py-14 flex-grow flex flex-col justify-center">
+
+    <!-- ==================== ANSICHT 1: EMPFÄNGER (PERSÖNLICHER LINK) ==================== -->
+    <section id="view-recipient" class="hidden">
+      <div class="bg-white rounded-3xl border border-[#EAE4D8] card-shadow overflow-hidden">
+        <!-- Festlicher Header -->
+        <div class="bg-pine text-cream px-6 py-10 sm:px-10 text-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 20% 20%, #D4B06A 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <p class="text-gold-light uppercase tracking-[0.22em] text-xs font-semibold mb-2">Geheime Auslosung</p>
+          <h1 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight">Familien Wichteln 2026</h1>
+        </div>
+
+        <!-- Karten-Inhalt -->
+        <div class="p-6 sm:p-10 text-center">
+          <p class="text-sm text-stone-500 mb-1">Persönliches Los für</p>
+          <h2 id="rec-giver-name" class="font-serif text-2xl sm:text-3xl font-semibold text-pine mb-8">...</h2>
+
+          <!-- Verdeckter Zustand -->
+          <div id="rec-locked-box" class="py-6 px-4 rounded-2xl bg-cream border border-[#EAE4D8] mb-8">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gold-light to-gold text-white flex items-center justify-center seal-glow">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
+            </div>
+            <p class="text-stone-600 text-sm max-w-sm mx-auto mb-6">
+              Stelle sicher, dass niemand heimlich auf deinen Bildschirm schaut, bevor du dein Los öffnest.
+            </p>
+            <button onclick="revealWichtel()" class="inline-flex items-center gap-2.5 bg-pine hover:bg-pine-light text-cream font-medium px-7 py-3.5 rounded-full transition-all shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer">
+              <span>Geschenk öffnen</span>
+              <span class="text-gold-light">✦</span>
+            </button>
+          </div>
+
+          <!-- Aufgedeckter Zustand -->
+          <div id="rec-revealed-box" class="hidden py-8 px-5 rounded-2xl bg-gradient-to-b from-gold-soft/70 to-cream border border-gold/30 mb-8 animate-reveal">
+            <p class="text-xs uppercase tracking-[0.2em] text-gold font-semibold mb-2">Du beschenkst in diesem Jahr</p>
+            <div id="rec-target-name" class="font-serif text-4xl sm:text-5xl font-bold text-pine my-3">...</div>
+            <p class="text-xs text-stone-500 mt-3">Psst – behalte dieses Geheimnis bis zur Bescherung für dich!</p>
+          </div>
+
+          <!-- Eckdaten & Regeln -->
+          <div class="bg-cream/80 rounded-2xl p-5 border border-[#EAE4D8] text-left space-y-3 text-sm">
+            <div class="flex items-center justify-between border-b border-[#EAE4D8] pb-2.5">
+              <span class="text-stone-500">Budget</span>
+              <span class="font-semibold text-pine">100 €</span>
+            </div>
+            <div class="flex items-center justify-between border-b border-[#EAE4D8] pb-2.5">
+              <span class="text-stone-500">Übergabe</span>
+              <span class="font-semibold text-pine">1. Weihnachtsfeiertag</span>
+            </div>
+            <div class="pt-0.5 text-stone-600 text-xs leading-relaxed">
+              <span class="font-semibold text-pine">Wunschzettel-Tipp:</span> Wenn du magst, poste deine Ideen in unsere WhatsApp-Gruppe mit dem Start: <em class="text-stone-800">„Lieber Wichtel, folgende Ideen hätte ich…“</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ANSICHT 2: ORGA LOGIN ==================== -->
+    <section id="view-login" class="hidden">
+      <div class="max-w-md mx-auto bg-white rounded-3xl border border-[#EAE4D8] card-shadow p-8 sm:p-10 text-center">
+        <div class="w-12 h-12 mx-auto mb-5 rounded-2xl bg-gold-soft text-gold flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <p class="text-gold uppercase tracking-[0.2em] text-xs font-semibold mb-1.5">Orga-Bereich</p>
+        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-pine mb-2">Familien Wichteln 2026</h1>
+        <p class="text-sm text-stone-500 mb-7">Bitte gib das Organisator-Passwort ein, um eine Auslosung zu starten oder das Archiv einzusehen.</p>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Passwort eingeben…"
+            required
+            class="w-full px-4 py-3 rounded-xl bg-cream border border-[#DFD8CA] focus:outline-none focus:border-pine text-center text-sm"
+          />
+          <p id="login-error" class="hidden text-xs text-red-600 font-medium">Falsches Passwort. Bitte erneut versuchen.</p>
+          <button type="submit" class="w-full bg-pine hover:bg-pine-light text-cream font-medium py-3 rounded-xl transition-colors cursor-pointer">
+            Orga-Bereich öffnen
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== ANSICHT 3: ORGA DASHBOARD ==================== -->
+    <section id="view-orga" class="hidden space-y-6">
+      <!-- Kopfbereich & Navigation -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+        <div>
+          <p class="text-gold uppercase tracking-[0.2em] text-xs font-semibold">Organisator-Zentrale</p>
+          <h1 class="font-serif text-3xl font-bold text-pine">Familien Wichteln 2026</h1>
+        </div>
+
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <div class="bg-white p-1 rounded-full border border-[#EAE4D8] inline-flex text-xs font-medium">
+            <button id="tab-btn-draw" onclick="switchTab('draw')" class="px-4 py-1.5 rounded-full bg-pine text-cream transition-colors cursor-pointer">
+              Auslosung
+            </button>
+            <button id="tab-btn-archive" onclick="switchTab('archive')" class="px-4 py-1.5 rounded-full text-stone-600 hover:text-pine transition-colors cursor-pointer">
+              Archiv (<span id="archive-count">0</span>)
+            </button>
+          </div>
+          <button onclick="logoutOrga()" title="Bereich sperren" class="p-2 rounded-full bg-white border border-[#EAE4D8] text-stone-500 hover:text-pine transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: NEUE AUSLOSUNG -->
+      <div id="panel-draw" class="space-y-6">
+        <!-- Eingabekarte -->
+        <div id="setup-card" class="bg-white rounded-3xl border border-[#EAE4D8] card-shadow p-6 sm:p-8 space-y-7">
+          <!-- Runden-Titel -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">Bezeichnung der Runde</label>
+            <input
+              type="text"
+              id="round-title"
+              value="Familien Wichteln 2026"
+              class="w-full px-4 py-2.5 rounded-xl bg-cream border border-[#DFD8CA] focus:outline-none focus:border-pine text-sm font-medium"
+            />
+          </div>
+
+          <!-- Teilnehmer hinzufügen -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500">Teilnehmer (<span id="participant-count">0</span>)</label>
+              <span class="text-xs text-stone-400">Mind. 3 Personen</span>
+            </div>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="new-participant-input"
+                placeholder="Name eingeben (z. B. Steffi)…"
+                onkeydown="if(event.key==='Enter'){event.preventDefault(); addParticipant();}"
+                class="flex-grow px-4 py-2.5 rounded-xl bg-cream border border-[#DFD8CA] focus:outline-none focus:border-pine text-sm"
+              />
+              <button onclick="addParticipant()" class="px-5 py-2.5 rounded-xl bg-pine hover:bg-pine-light text-cream text-sm font-medium transition-colors cursor-pointer">
+                Hinzufügen
+              </button>
+            </div>
+
+            <!-- Teilnehmer-Liste (Pills) -->
+            <div id="participants-list" class="flex flex-wrap gap-2 mt-4"></div>
+          </div>
+
+          <!-- Ausschlussregeln -->
+          <div class="pt-5 border-t border-[#EAE4D8]">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="text-sm font-semibold text-pine">Ausschlussregeln (Optional)</h3>
+                <p class="text-xs text-stone-500">Lege fest, wer wen nicht ziehen darf (z. B. Paare).</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+              <select id="excl-person-a" class="px-3.5 py-2.5 rounded-xl bg-cream border border-[#DFD8CA] text-sm focus:outline-none focus:border-pine">
+                <option value="">Person A wählen…</option>
+              </select>
+              <select id="excl-person-b" class="px-3.5 py-2.5 rounded-xl bg-cream border border-[#DFD8CA] text-sm focus:outline-none focus:border-pine">
+                <option value="">Person B wählen…</option>
+              </select>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <label class="inline-flex items-center gap-2 text-xs text-stone-600 cursor-pointer select-none">
+                <input type="checkbox" id="excl-mutual" checked class="rounded border-stone-300 text-pine focus:ring-pine" />
+                <span>Gegenseitig ausschließen (Paar-Regel)</span>
+              </label>
+              <button onclick="addExclusion()" class="px-4 py-2 rounded-xl bg-gold-soft hover:bg-gold/20 text-pine text-xs font-semibold transition-colors cursor-pointer">
+                + Regel hinzufügen
+              </button>
+            </div>
+
+            <!-- Aktive Ausschlüsse -->
+            <div id="exclusions-list" class="flex flex-wrap gap-2 mt-4"></div>
+          </div>
+
+          <!-- Fehlermeldung & Start-Button -->
+          <div class="pt-2">
+            <p id="draw-error" class="hidden text-xs text-red-600 font-medium mb-3 bg-red-50 px-3.5 py-2.5 rounded-xl border border-red-100"></p>
+            <button onclick="runDraw()" class="w-full py-3.5 px-6 rounded-2xl bg-pine hover:bg-pine-light text-cream font-medium text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>Jetzt geheim auslosen & Links erstellen</span>
+              <span class="text-gold-light">✦</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ergebnis-Karte (Links zum Verteilen) -->
+        <div id="results-card" class="hidden bg-white rounded-3xl border border-[#EAE4D8] card-shadow p-6 sm:p-8 space-y-6 animate-reveal">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EAE4D8]">
+            <div>
+              <span class="inline-block text-[11px] font-semibold uppercase tracking-wider text-gold bg-gold-soft px-2.5 py-0.5 rounded-full mb-1">Auslosung bereit</span>
+              <h2 id="res-round-title" class="font-serif text-2xl font-bold text-pine">Familien Wichteln 2026</h2>
+              <p class="text-xs text-stone-500 mt-0.5">Die Zuordnungen sind verschlüsselt. Auch du siehst nicht, wer wen gezogen hat.</p>
+            </div>
+            <button onclick="resetToSetup()" class="self-start text-xs font-medium text-stone-500 hover:text-pine underline underline-offset-4 cursor-pointer">
+              Neue Runde starten
+            </button>
+          </div>
+
+          <div id="results-links-list" class="divide-y divide-[#F0ECE3]"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ARCHIV -->
+      <div id="panel-archive" class="hidden bg-white rounded-3xl border border-[#EAE4D8] card-shadow p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EAE4D8]">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-pine">Gespeicherte Runden</h2>
+            <p class="text-xs text-stone-500">Lokal in diesem Browser gespeichert. Nutze das Backup für einen Gerätewechsel.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportBackup()" class="px-3.5 py-2 rounded-xl bg-cream hover:bg-[#EFECE4] border border-[#DFD8CA] text-xs font-medium text-pine transition-colors cursor-pointer">
+              Backup (JSON)
+            </button>
+            <label class="px-3.5 py-2 rounded-xl bg-cream hover:bg-[#EFECE4] border border-[#DFD8CA] text-xs font-medium text-pine transition-colors cursor-pointer">
+              Import
+              <input type="file" accept=".json" onchange="importBackup(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <div id="archive-list" class="space-y-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Dezenter Footer -->
+  <footer class="text-center py-6 text-xs text-stone-400">
+    Familien Wichteln 2026 · 100 % lokal & verschlüsselt im Link
+  </footer>
+
+  <script>
+    // =========================================================================
+    // KONFIGURATION: Hier kannst du dein Organisator-Passwort anpassen
+    // =========================================================================
+    const ORGA_PASSWORD = "SolConWichtel2026";
+    const STORAGE_KEY = "familien_wichteln_archive_v1";
+    const SESSION_KEY = "familien_wichteln_unlocked";
+
+    // App-Zustand
+    let participants = [];
+    let exclusions = []; // Array von { from: string, to: string }
+
+    // Initialisierung beim Laden der Seite
+    window.addEventListener("DOMContentLoaded", () => {
+      checkRoute();
+      updateArchiveCount();
+    });
+
+    window.addEventListener("hashchange", checkRoute);
+
+    function checkRoute() {
+      const hash = window.location.hash;
+      hideAllViews();
+
+      if (hash && hash.startsWith("#wichtel=")) {
+        const encoded = hash.replace("#wichtel=", "");
+        loadRecipientView(encoded);
+      } else {
+        const isUnlocked = sessionStorage.getItem(SESSION_KEY) === "true";
+        if (isUnlocked) {
+          showOrgaDashboard();
+        } else {
+          document.getElementById("view-login").classList.remove("hidden");
+        }
+      }
+    }
+
+    function hideAllViews() {
+      document.getElementById("view-recipient").classList.add("hidden");
+      document.getElementById("view-login").classList.add("hidden");
+      document.getElementById("view-orga").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // LOGIN / LOGOUT
+    // =========================================================================
+    function handleLogin(e) {
+      e.preventDefault();
+      const input = document.getElementById("login-password").value;
+      const err = document.getElementById("login-error");
+
+      if (input === ORGA_PASSWORD) {
+        sessionStorage.setItem(SESSION_KEY, "true");
+        err.classList.add("hidden");
+        document.getElementById("login-password").value = "";
+        showOrgaDashboard();
+      } else {
+        err.classList.remove("hidden");
+      }
+    }
+
+    function logoutOrga() {
+      sessionStorage.removeItem(SESSION_KEY);
+      checkRoute();
+    }
+
+    function showOrgaDashboard() {
+      document.getElementById("view-orga").classList.remove("hidden");
+      renderParticipants();
+      renderExclusions();
+    }
+
+    function switchTab(tab) {
+      const drawPanel = document.getElementById("panel-draw");
+      const archivePanel = document.getElementById("panel-archive");
+      const btnDraw = document.getElementById("tab-btn-draw");
+      const btnArchive = document.getElementById("tab-btn-archive");
+
+      if (tab === "draw") {
+        drawPanel.classList.remove("hidden");
+        archivePanel.classList.add("hidden");
+        btnDraw.className = "px-4 py-1.5 rounded-full bg-pine text-cream transition-colors cursor-pointer";
+        btnArchive.className = "px-4 py-1.5 rounded-full text-stone-600 hover:text-pine transition-colors cursor-pointer";
+      } else {
+        drawPanel.classList.add("hidden");
+        archivePanel.classList.remove("hidden");
+        btnArchive.className = "px-4 py-1.5 rounded-full bg-pine text-cream transition-colors cursor-pointer";
+        btnDraw.className = "px-4 py-1.5 rounded-full text-stone-600 hover:text-pine transition-colors cursor-pointer";
+        renderArchive();
+      }
+    }
+
+    // =========================================================================
+    // TEILNEHMER & AUSSCHLÜSSE VERWALTEN
+    // =========================================================================
+    function addParticipant() {
+      const input = document.getElementById("new-participant-input");
+      const name = input.value.trim();
+      if (!name) return;
+
+      if (participants.some((p) => p.toLowerCase() === name.toLowerCase())) {
+        showDrawError(`„${name}“ steht bereits auf der Liste.`);
+        return;
+      }
+
+      clearDrawError();
+      participants.push(name);
+      input.value = "";
+      input.focus();
+      renderParticipants();
+    }
+
+    function removeParticipant(name) {
+      participants = participants.filter((p) => p !== name);
+      exclusions = exclusions.filter((ex) => ex.from !== name && ex.to !== name);
+      renderParticipants();
+      renderExclusions();
+    }
+
+    function renderParticipants() {
+      const list = document.getElementById("participants-list");
+      const count = document.getElementById("participant-count");
+      const selA = document.getElementById("excl-person-a");
+      const selB = document.getElementById("excl-person-b");
+
+      count.textContent = participants.length;
+      list.innerHTML = "";
+
+      participants.forEach((name) => {
+        const pill = document.createElement("span");
+        pill.className = "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream border border-[#DFD8CA] text-sm text-pine font-medium";
+        pill.innerHTML = `
+          <span>${escapeHtml(name)}</span>
+          <button onclick="removeParticipant('${escapeJs(name)}')" class="text-stone-400 hover:text-red-600 transition-colors cursor-pointer" title="Entfernen">&times;</button>
+        `;
+        list.appendChild(pill);
+      });
+
+      // Dropdowns aktualisieren
+      const optionsHtml = `<option value="">Person wählen…</option>` +
+        participants.map((p) => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+      selA.innerHTML = optionsHtml;
+      selB.innerHTML = optionsHtml;
+    }
+
+    function addExclusion() {
+      const a = document.getElementById("excl-person-a").value;
+      const b = document.getElementById("excl-person-b").value;
+      const mutual = document.getElementById("excl-mutual").checked;
+
+      if (!a || !b) {
+        showDrawError("Bitte wähle zwei Personen für die Ausschlussregel aus.");
+        return;
+      }
+      if (a === b) {
+        showDrawError("Eine Person schließt sich ohnehin selbst aus.");
+        return;
+      }
+
+      clearDrawError();
+      addSingleExclusion(a, b);
+      if (mutual) {
+        addSingleExclusion(b, a);
+      }
+      renderExclusions();
+    }
+
+    function addSingleExclusion(from, to) {
+      if (!exclusions.some((ex) => ex.from === from && ex.to === to)) {
+        exclusions.push({ from, to });
+      }
+    }
+
+    function removeExclusion(index) {
+      exclusions.splice(index, 1);
+      renderExclusions();
+    }
+
+    function renderExclusions() {
+      const container = document.getElementById("exclusions-list");
+      container.innerHTML = "";
+
+      exclusions.forEach((ex, idx) => {
+        const badge = document.createElement("span");
+        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-soft/80 border border-gold/25 text-xs text-pine";
+        badge.innerHTML = `
+          <span>${escapeHtml(ex.from)} <strong>&ne;</strong> ${escapeHtml(ex.to)}</span>
+          <button onclick="removeExclusion(${idx})" class="text-stone-400 hover:text-red-600 ml-1 cursor-pointer">&times;</button>
+        `;
+        container.appendChild(badge);
+      });
+    }
+
+    // =========================================================================
+    // AUSLOSUNG & VERSCHLÜSSELUNG IN DER URL
+    // =========================================================================
+    function runDraw() {
+      clearDrawError();
+      const title = document.getElementById("round-title").value.trim() || "Familien Wichteln 2026";
+
+      if (participants.length < 3) {
+        showDrawError("Für eine geheime Auslosung werden mindestens 3 Teilnehmer benötigt.");
+        return;
+      }
+
+      const assignment = findValidAssignment(participants, exclusions);
+      if (!assignment) {
+        showDrawError("Für diese Kombination aus Ausschlussregeln gibt es leider keine gültige Lösung. Bitte entferne eine Regel.");
+        return;
+      }
+
+      const baseUrl = window.location.origin + window.location.pathname;
+      const results = participants.map((giver) => {
+        const target = assignment[giver];
+        const token = encodePayload({ g: giver, t: target });
+        return {
+          name: giver,
+          link: `${baseUrl}#wichtel=${token}`,
+        };
+      });
+
+      // Im Archiv speichern
+      saveRoundToArchive({
+        id: Date.now(),
+        title,
+        date: new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }),
+        participants: [...participants],
+        exclusions: [...exclusions],
+        results,
+      });
+
+      displayResults(title, results);
+    }
+
+    // Backtracking-Algorithmus für eine garantiert gültige, zufällige Zuordnung
+    function findValidAssignment(people, rules) {
+      const forbidden = new Set(rules.map((r) => `${r.from}|||${r.to}`));
+      const shuffledTargets = [...people];
+
+      function backtrack(idx, used, currentMap) {
+        if (idx === people.length) return currentMap;
+
+        const giver = people[idx];
+        // Zufällige Reihenfolge der Kandidaten pro Schritt
+        const candidates = [...shuffledTargets].sort(() => Math.random() - 0.5);
+
+        for (const target of candidates) {
+          if (used.has(target)) continue;
+          if (giver === target) continue;
+          if (forbidden.has(`${giver}|||${target}`)) continue;
+
+          used.add(target);
+          currentMap[giver] = target;
+
+          const res = backtrack(idx + 1, used, currentMap);
+          if (res) return res;
+
+          used.delete(target);
+          delete currentMap[giver];
+        }
+        return null;
+      }
+
+      return backtrack(0, new Set(), {});
+    }
+
+    function encodePayload(obj) {
+      const json = JSON.stringify(obj);
+      const bytes = new TextEncoder().encode(json);
+      let bin = "";
+      bytes.forEach((b) => (bin += String.fromCharCode(b)));
+      return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function decodePayload(token) {
+      let b64 = token.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const json = new TextDecoder().decode(bytes);
+      return JSON.parse(json);
+    }
+
+    function displayResults(title, results) {
+      document.getElementById("setup-card").classList.add("hidden");
+      const resCard = document.getElementById("results-card");
+      resCard.classList.remove("hidden");
+      document.getElementById("res-round-title").textContent = title;
+
+      const list = document.getElementById("results-links-list");
+      list.innerHTML = "";
+
+      results.forEach((item) => {
+        const waText = `Hey ${item.name}, hier ist dein persönlicher, geheimer Link für unser Familien Wichteln 2026! 🎅🎁\n\nKlick einfach drauf, dann siehst du sofort, wen du beschenken darfst (nur du kannst das sehen):\n👉 ${item.link}\n\nViel Spaß beim Stöbern! 🛍️`;
+        const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+        const row = document.createElement("div");
+        row.className = "py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gold-soft text-pine font-serif font-bold flex items-center justify-center text-sm">
+              ${escapeHtml(item.name.charAt(0).toUpperCase())}
+            </div>
+            <span class="font-medium text-pine">${escapeHtml(item.name)}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="${waUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1F7A4C] hover:bg-[#19633E] text-white text-xs font-medium transition-colors">
+              <span>Per WhatsApp senden</span>
+            </a>
+            <button onclick="copyLink(this, '${escapeJs(item.link)}')" class="px-3.5 py-2 rounded-xl bg-cream hover:bg-[#EFECE4] border border-[#DFD8CA] text-xs font-medium text-pine transition-colors cursor-pointer">
+              Link kopieren
+            </button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function copyLink(btn, link) {
+      navigator.clipboard.writeText(link).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = "Kopiert ✓";
+        setTimeout(() => (btn.textContent = orig), 1800);
+      });
+    }
+
+    function resetToSetup() {
+      document.getElementById("results-card").classList.add("hidden");
+      document.getElementById("setup-card").classList.remove("hidden");
+    }
+
+    // =========================================================================
+    // EMPFÄNGER-ANSICHT
+    // =========================================================================
+    function loadRecipientView(token) {
+      try {
+        const data = decodePayload(token);
+        if (!data || !data.g || !data.t) throw new Error("Ungültiger Token");
+
+        document.getElementById("rec-giver-name").textContent = data.g;
+        document.getElementById("rec-target-name").textContent = data.t;
+        document.getElementById("rec-locked-box").classList.remove("hidden");
+        document.getElementById("rec-revealed-box").classList.add("hidden");
+        document.getElementById("view-recipient").classList.remove("hidden");
+      } catch (e) {
+        alert("Dieser Wichtel-Link scheint leider ungültig oder unvollständig zu sein.");
+        window.location.hash = "";
+      }
+    }
+
+    function revealWichtel() {
+      document.getElementById("rec-locked-box").classList.add("hidden");
+      document.getElementById("rec-revealed-box").classList.remove("hidden");
+
+      if (typeof confetti === "function") {
+        confetti({
+          particleCount: 65,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ["#1B3B2B", "#B48A3E", "#D4B06A", "#FAF8F5"],
+        });
+      }
+    }
+
+    // =========================================================================
+    // ARCHIV & BACKUP (LOCALSTORAGE)
+    // =========================================================================
+    function getArchive() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRoundToArchive(round) {
+      const archive = getArchive();
+      archive.unshift(round);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(archive));
+      updateArchiveCount();
+    }
+
+    function updateArchiveCount() {
+      const el = document.getElementById("archive-count");
+      if (el) el.textContent = getArchive().length;
+    }
+
+    function renderArchive() {
+      const container = document.getElementById("archive-list");
+      const archive = getArchive();
+
+      if (archive.length === 0) {
+        container.innerHTML = `<p class="text-sm text-stone-400 text-center py-8">Noch keine gespeicherten Runden vorhanden.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      archive.forEach((round, idx) => {
+        const card = document.createElement("div");
+        card.className = "p-5 rounded-2xl bg-cream/70 border border-[#EAE4D8] space-y-3";
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="font-serif text-lg font-bold text-pine">${escapeHtml(round.title)}</h3>
+              <p class="text-xs text-stone-500">Erstellt am ${escapeHtml(round.date)} · ${round.participants.length} Teilnehmer</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="openArchivedResults(${idx})" class="px-3 py-1.5 rounded-lg bg-pine text-cream text-xs font-medium hover:bg-pine-light cursor-pointer">
+                Links anzeigen
+              </button>
+              <button onclick="loadRoundAsTemplate(${idx})" class="px-3 py-1.5 rounded-lg bg-white border border-[#DFD8CA] text-pine text-xs font-medium hover:bg-cream cursor-pointer">
+                Als Vorlage laden
+              </button>
+              <button onclick="deleteArchivedRound(${idx})" class="px-2.5 py-1.5 rounded-lg text-stone-400 hover:text-red-600 text-xs cursor-pointer" title="Löschen">
+                Löschen
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openArchivedResults(idx) {
+      const round = getArchive()[idx];
+      if (!round) return;
+      switchTab("draw");
+      displayResults(round.title, round.results);
+    }
+
+    function loadRoundAsTemplate(idx) {
+      const round = getArchive()[idx];
+      if (!round) return;
+      participants = [...round.participants];
+      exclusions = [...round.exclusions];
+      document.getElementById("round-title").value = round.title;
+      switchTab("draw");
+      resetToSetup();
+      renderParticipants();
+      renderExclusions();
+    }
+
+    function deleteArchivedRound(idx) {
+      const archive = getArchive();
+      archive.splice(idx, 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(archive));
+      updateArchiveCount();
+      renderArchive();
+    }
+
+    function exportBackup() {
+      const dataStr = JSON.stringify(getArchive(), null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `familien-wichteln-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+          updateArchiveCount();
+          renderArchive();
+        } catch {
+          alert("Die ausgewählte Backup-Datei ist ungültig.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Hilfsfunktionen
+    function showDrawError(msg) {
+      const el = document.getElementById("draw-error");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+
+    function clearDrawError() {
+      document.getElementById("draw-error").classList.add("hidden");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeJs(str) {
+      return String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+  </script>
+</body>
+</html>
